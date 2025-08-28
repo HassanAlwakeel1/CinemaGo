@@ -1,4 +1,4 @@
-package com.CinemaGo.service;
+package com.CinemaGo.unit.service;
 
 import com.CinemaGo.model.entity.Token;
 import com.CinemaGo.repository.TokenRepository;

@@ -1,5 +1,6 @@
-package com.CinemaGo.controller;
+package com.CinemaGo.unit.controller;
 
+import com.CinemaGo.controller.VerificationController;
 import com.CinemaGo.model.entity.User;
 import com.CinemaGo.model.entity.VerificationToken;
 import com.CinemaGo.repository.UserRepository;

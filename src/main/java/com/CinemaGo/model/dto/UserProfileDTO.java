@@ -13,8 +13,7 @@ public class UserProfileDTO {
     private Long id;
     private String firstName;
     private String lastName;
-    private String Bio;
-    private MultipartFile profilePicture;
+    private String bio;
     //Here I didn't put password and email beacuse they will have another way to handle
 }
 

@@ -73,7 +73,7 @@ public class User implements UserDetails {
     @Column(name = "enabled")
     private boolean enabled = false; // By default, the user is not enabled
 
-    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE)
+    @OneToMany(mappedBy = "user",cascade = CascadeType.REMOVE,orphanRemoval = true)
     @JsonManagedReference
     private List<Token> tokens;
 

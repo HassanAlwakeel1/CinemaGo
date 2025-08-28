@@ -1,13 +1,11 @@
 package com.CinemaGo.controller;
 
-import com.CinemaGo.model.dto.ChangePasswordDTO;
-import com.CinemaGo.model.dto.CustomUserDTO;
-import com.CinemaGo.model.dto.UserDTO;
-import com.CinemaGo.model.dto.UserProfileDTO;
+import com.CinemaGo.model.dto.*;
 import com.CinemaGo.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -33,9 +31,17 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserProfileDTO> updateUserProfile(@ModelAttribute UserProfileDTO userProfileDTO,
-                                                                @PathVariable(value = "id") Long userId){
+    public ResponseEntity<UserProfileDTO> updateUserProfile(
+            @RequestBody UserProfileDTO userProfileDTO,
+            @PathVariable("id") Long userId) {
         return userService.updateUserProfile(userProfileDTO, userId);
+    }
+
+    @PutMapping("/{id}/profile-picture")
+    public ResponseEntity<ProfileDTO> updateProfilePicture(
+            @PathVariable("id") Long userId,
+            @RequestParam("file") MultipartFile file) {
+        return userService.updateProfilePicture(userId, file);
     }
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable(name = "id") Long userId){

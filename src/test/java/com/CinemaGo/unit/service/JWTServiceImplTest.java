@@ -1,4 +1,4 @@
-package com.CinemaGo.service;
+package com.CinemaGo.unit.service;
 
 import com.CinemaGo.service.impl.JWTServiceImpl;
 import org.junit.jupiter.api.BeforeEach;

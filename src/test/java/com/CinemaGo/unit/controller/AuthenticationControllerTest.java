@@ -1,5 +1,6 @@
-package com.CinemaGo.controller;
+package com.CinemaGo.unit.controller;
 
+import com.CinemaGo.controller.AuthenticationController;
 import com.CinemaGo.model.dto.*;
 import com.CinemaGo.service.AuthenticationService;
 import org.junit.jupiter.api.BeforeEach;

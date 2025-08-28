@@ -10,10 +10,10 @@ public interface UserMapper {
 
     public UserDTO userToUserDTO(User user);
 
-    public UserProfileDTO userToUpdatedProfileDTO(User user);
+    public ProfileDTO userToProfileDTO(User user);
 
     public CustomUserDTO userToCustomUserDTO(User user);
 
-    public  ProfileDTO userToProfileDTO(User user);
+    public  UserProfileDTO userToUserProfileDTO(User user);
 }
 

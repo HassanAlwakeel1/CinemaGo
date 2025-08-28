@@ -1,4 +1,4 @@
-package com.CinemaGo.service;
+package com.CinemaGo.unit.service;
 
 import com.CinemaGo.model.dto.JwtAuthenticationResponse;
 import com.CinemaGo.model.dto.RefreshTokenRequest;
@@ -12,6 +12,8 @@ import com.CinemaGo.model.entity.enums.Role;
 import com.CinemaGo.repository.PasswordResetTokenRepository;
 import com.CinemaGo.repository.TokenRepository;
 import com.CinemaGo.repository.UserRepository;
+import com.CinemaGo.service.JWTService;
+import com.CinemaGo.service.VerificationTokenService;
 import com.CinemaGo.service.impl.AuthenticationServiceImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

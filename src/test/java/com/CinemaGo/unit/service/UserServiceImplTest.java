@@ -1,13 +1,11 @@
-package com.CinemaGo.service;
+package com.CinemaGo.unit.service;
 
 import com.CinemaGo.exception.ResourceNotFoundException;
-import com.CinemaGo.model.dto.ChangePasswordDTO;
-import com.CinemaGo.model.dto.CustomUserDTO;
-import com.CinemaGo.model.dto.UserDTO;
-import com.CinemaGo.model.dto.UserProfileDTO;
+import com.CinemaGo.model.dto.*;
 import com.CinemaGo.model.entity.User;
 import com.CinemaGo.model.mapper.UserMapper;
 import com.CinemaGo.repository.UserRepository;
+import com.CinemaGo.service.CloudinaryImageService;
 import com.CinemaGo.service.impl.UserServiceImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,28 +62,28 @@ class UserServiceImplTest {
     }
 
     @Test
-    void updateUserProfile_WithPhoto_ShouldUploadAndSave() throws Exception {
+    void updateUserProfile_ShouldUpdateFieldsWithoutPhoto() {
         Long userId = 1L;
         User user = new User();
+        user.setId(userId);
+
         UserProfileDTO dto = new UserProfileDTO();
         dto.setFirstName("John");
         dto.setLastName("Doe");
-        dto.setBio("Bio");
-        MultipartFile photo = mock(MultipartFile.class);
-        dto.setProfilePicture(photo);
+        dto.setBio("Developer");
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
-        when(photo.isEmpty()).thenReturn(false);
-        when(cloudinaryImageService.upload(photo)).thenReturn(Map.of("secure_url", "url"));
-        when(userMapper.userToUpdatedProfileDTO(user)).thenReturn(dto);
+        when(userMapper.userToUserProfileDTO(user)).thenReturn(dto);
 
         ResponseEntity<UserProfileDTO> response = userService.updateUserProfile(dto, userId);
 
         assertEquals(dto, response.getBody());
         verify(userRepository).save(user);
         assertEquals("John", user.getFirstName());
-        assertEquals("url", user.getProfilePictureURL());
+        assertEquals("Doe", user.getLastName());
+        assertEquals("Developer", user.getBio());
     }
+
 
     @Test
     void deleteUser_UserExists_ShouldDelete() {
@@ -99,6 +97,32 @@ class UserServiceImplTest {
         verify(userRepository).delete(user);
         assertEquals("User deleted successfully", response.getBody());
     }
+
+    @Test
+    void updateProfilePicture_ShouldUploadAndSave() {
+        Long userId = 1L;
+        User user = new User();
+        user.setId(userId);
+
+        MultipartFile photo = mock(MultipartFile.class);
+        ProfileDTO dto = new ProfileDTO();
+        dto.setId(userId);
+        dto.setFirstName(user.getFirstName());
+        dto.setLastName(user.getLastName());
+        dto.setBio(user.getBio());
+
+        when(userRepository.findById(userId)).thenReturn(Optional.of(user));
+        when(photo.isEmpty()).thenReturn(false);
+        when(cloudinaryImageService.upload(photo)).thenReturn(Map.of("secure_url", "url"));
+        when(userMapper.userToProfileDTO(user)).thenReturn(dto);
+
+        ResponseEntity<ProfileDTO> response = userService.updateProfilePicture(userId, photo);
+
+        assertEquals(dto, response.getBody());
+        verify(userRepository).save(user);
+        assertEquals("url", user.getProfilePictureURL());
+    }
+
 
     @Test
     void getAllUsers_ShouldReturnList() {

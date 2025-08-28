@@ -25,7 +25,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(authenticationService.signin(signInRequest));
     }
 
-    @GetMapping("/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<JwtAuthenticationResponse> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
         return ResponseEntity.ok(authenticationService.refreshToken(refreshTokenRequest));
     }

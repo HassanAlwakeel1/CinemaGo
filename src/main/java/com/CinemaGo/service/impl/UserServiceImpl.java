@@ -1,10 +1,7 @@
 package com.CinemaGo.service.impl;
 
 import com.CinemaGo.exception.ResourceNotFoundException;
-import com.CinemaGo.model.dto.ChangePasswordDTO;
-import com.CinemaGo.model.dto.CustomUserDTO;
-import com.CinemaGo.model.dto.UserDTO;
-import com.CinemaGo.model.dto.UserProfileDTO;
+import com.CinemaGo.model.dto.*;
 import com.CinemaGo.model.entity.User;
 import com.CinemaGo.model.mapper.UserMapper;
 import com.CinemaGo.repository.UserRepository;
@@ -62,24 +59,57 @@ public class UserServiceImpl implements UserService {
     }
 
 
+//    @Override
+//    public ResponseEntity<UserProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId) {
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+//
+//        user.setFirstName(userProfileDTO.getFirstName());
+//        user.setLastName(userProfileDTO.getLastName());
+//        user.setBio(userProfileDTO.getBio());
+//        MultipartFile photo = userProfileDTO.getProfilePicture();
+//        if (photo != null && !photo.isEmpty()) {
+//            Map uploadImageMap = cloudinaryImageService.upload(photo);
+//            String photoUrl = (String)uploadImageMap.get("secure_url");
+//            user.setProfilePictureURL(photoUrl);
+//        }
+//        userRepository.save(user);
+//        UserProfileDTO updatedUserProfileDTO = userMapper.userToUpdatedProfileDTO(user);
+//        return ResponseEntity.ok(updatedUserProfileDTO);
+//    }
+
     @Override
     public ResponseEntity<UserProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
         user.setFirstName(userProfileDTO.getFirstName());
         user.setLastName(userProfileDTO.getLastName());
         user.setBio(userProfileDTO.getBio());
-        MultipartFile photo = userProfileDTO.getProfilePicture();
-        if (photo != null && !photo.isEmpty()) {
-            Map uploadImageMap = cloudinaryImageService.upload(photo);
-            String photoUrl = (String)uploadImageMap.get("secure_url");
-            user.setProfilePictureURL(photoUrl);
-        }
+
         userRepository.save(user);
-        UserProfileDTO updatedUserProfileDTO = userMapper.userToUpdatedProfileDTO(user);
+
+        UserProfileDTO updatedUserProfileDTO = userMapper.userToUserProfileDTO(user);
         return ResponseEntity.ok(updatedUserProfileDTO);
     }
+
+    @Override
+    public ResponseEntity<ProfileDTO> updateProfilePicture(Long userId, MultipartFile photo) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
+
+        if (photo != null && !photo.isEmpty()) {
+            Map uploadImageMap = cloudinaryImageService.upload(photo);
+            String photoUrl = (String) uploadImageMap.get("secure_url");
+            user.setProfilePictureURL(photoUrl);
+        }
+
+        userRepository.save(user);
+        ProfileDTO updatedProfileDTO = userMapper.userToProfileDTO(user);
+        return ResponseEntity.ok(updatedProfileDTO);
+    }
+
+
 
     @Override
     public ResponseEntity<String> deleteUser(Long userId) {

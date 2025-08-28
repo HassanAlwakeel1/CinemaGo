@@ -22,10 +22,10 @@ public class UserMapperImpl implements UserMapper {
         return mapper.map(user,UserDTO.class);
     }
 
-    @Override
-    public UserProfileDTO userToUpdatedProfileDTO(User user) {
-        return mapper.map(user,UserProfileDTO.class);
-    }
+//    @Override
+//    public UserProfileDTO userToUserProfileDTO(User user) {
+//        return mapper.map(user,UserProfileDTO.class);
+//    }
 
     @Override
     public CustomUserDTO userToCustomUserDTO(User user){
@@ -35,6 +35,11 @@ public class UserMapperImpl implements UserMapper {
     @Override
     public ProfileDTO userToProfileDTO(User user) {
         return mapper.map(user,ProfileDTO.class);
+    }
+
+    @Override
+    public UserProfileDTO userToUserProfileDTO(User user) {
+        return mapper.map(user,UserProfileDTO.class);
     }
 
 

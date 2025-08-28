@@ -1,11 +1,9 @@
 package com.CinemaGo.service;
 
-import com.CinemaGo.model.dto.ChangePasswordDTO;
-import com.CinemaGo.model.dto.CustomUserDTO;
-import com.CinemaGo.model.dto.UserDTO;
-import com.CinemaGo.model.dto.UserProfileDTO;
+import com.CinemaGo.model.dto.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -20,4 +18,5 @@ public interface UserService {
     ResponseEntity<List<CustomUserDTO>> getAllUsers();
 
     ResponseEntity<String> changePassword(ChangePasswordDTO changePasswordDTO, Long userId);
+    ResponseEntity<ProfileDTO> updateProfilePicture(Long userId, MultipartFile photo);
 }
