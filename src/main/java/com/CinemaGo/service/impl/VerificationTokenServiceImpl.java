@@ -13,8 +13,12 @@ import java.util.UUID;
 @Service
 public class VerificationTokenServiceImpl implements VerificationTokenService {
 
-    @Autowired
-    private VerificationTokenRepository tokenRepository;
+    private final VerificationTokenRepository tokenRepository;
+
+    // Constructor injection
+    public VerificationTokenServiceImpl(VerificationTokenRepository tokenRepository) {
+        this.tokenRepository = tokenRepository;
+    }
 
     @Override
     public VerificationToken createToken(User user) {
