@@ -1,5 +1,6 @@
 package com.CinemaGo.service.impl;
 
+import com.CinemaGo.exception.ResourceNotFoundException;
 import com.CinemaGo.model.dto.MovieDTO;
 import com.CinemaGo.model.dto.MovieResponseDTO;
 import com.CinemaGo.model.entity.Movie;
@@ -13,7 +14,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -53,7 +53,7 @@ public class MovieServiceImpl implements MovieService {
     @Override
     public MovieDTO getMovie(Long id) {
         Movie movie = movieRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Movie not found with id " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", id));
         return movieMapper.toDTO(movie);
     }
 
@@ -73,6 +73,8 @@ public class MovieServiceImpl implements MovieService {
 
     @Override
     public void deleteMovie(Long id) {
-        movieRepository.deleteById(id);
+        Movie movie = movieRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", id));
+        movieRepository.delete(movie);
     }
 }
