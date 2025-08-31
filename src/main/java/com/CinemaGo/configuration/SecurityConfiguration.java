@@ -41,7 +41,8 @@ public class SecurityConfiguration {
                                             "/swagger-resources/**",
                                             "/webjars/**",
                                             "/api/users/**",
-                                            "/api/v1/movies/**")  // Allow API documentation access)
+                                            "/api/v1/movies/**",
+                                            "/api/v1/halls/**")  // Allow API documentation access)
                                     .permitAll()
                                     .anyRequest().authenticated();
 
