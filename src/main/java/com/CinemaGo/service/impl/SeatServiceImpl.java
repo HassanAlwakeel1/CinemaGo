@@ -10,7 +10,9 @@ import com.CinemaGo.repository.HallRepository;
 import com.CinemaGo.repository.SeatRepository;
 import com.CinemaGo.service.SeatService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -29,8 +31,12 @@ public class SeatServiceImpl implements SeatService {
                 .orElseThrow(() -> new ResourceNotFoundException("Hall", "id", dto.getHallId()));
 
         boolean exists = seatRepository.existsByHallAndSeatNumber(hall, dto.getSeatNumber());
+
         if (exists) {
-            throw new RuntimeException("Seat number " + dto.getSeatNumber() + " already exists in this hall");
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Seat number " + dto.getSeatNumber() + " already exists in this hall"
+            );
         }
 
         Seat seat = seatMapper.toEntity(dto);
