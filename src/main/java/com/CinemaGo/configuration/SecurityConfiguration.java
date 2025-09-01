@@ -44,7 +44,9 @@ public class SecurityConfiguration {
                                             "/api/v1/movies/**",
                                             "/api/v1/halls/**",
                                             "/api/v1/seats/**",
-                                            "/api/v1/showtimes/**")  // Allow API documentation access)
+                                            "/api/v1/showtimes/**",
+                                            "/api/payments/**",
+                                            "/api/webhooks/**")  // Allow API documentation access)
                                     .permitAll()
                                     .anyRequest().authenticated();
 
