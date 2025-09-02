@@ -46,7 +46,8 @@ public class SecurityConfiguration {
                                             "/api/v1/seats/**",
                                             "/api/v1/showtimes/**",
                                             "/api/payments/**",
-                                            "/api/webhooks/**")  // Allow API documentation access)
+                                            "/api/webhooks/**",
+                                            "/api/v1/seatReservations/**")  // Allow API documentation access)
                                     .permitAll()
                                     .anyRequest().authenticated();
 
