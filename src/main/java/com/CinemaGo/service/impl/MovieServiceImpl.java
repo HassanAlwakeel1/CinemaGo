@@ -14,6 +14,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -76,5 +77,24 @@ public class MovieServiceImpl implements MovieService {
         Movie movie = movieRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Movie", "id", id));
         movieRepository.delete(movie);
+    }
+    @Override
+    public List<Movie> getNowPlayingMovies() {
+        LocalDate today = LocalDate.now();
+        return movieRepository.findNowPlayingMovies(today);
+    }
+
+    @Override
+    public List<Movie> getComingSoonMovies() {
+        LocalDate today = LocalDate.now();
+        return movieRepository.findComingSoonMovies(today);
+    }
+
+    @Override
+    public void updateMovieAvailability(Long movieId, boolean available) {
+        Movie movie = movieRepository.findById(movieId)
+                .orElseThrow(() -> new RuntimeException("Movie not found"));
+        movie.setAvailable(available);
+        movieRepository.save(movie);
     }
 }

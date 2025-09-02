@@ -2,6 +2,7 @@ package com.CinemaGo.controller;
 
 import com.CinemaGo.model.dto.MovieDTO;
 import com.CinemaGo.model.dto.MovieResponseDTO;
+import com.CinemaGo.model.entity.Movie;
 import com.CinemaGo.service.MovieService;
 import com.CinemaGo.utility.AppConstants;
 import lombok.RequiredArgsConstructor;
@@ -52,5 +53,23 @@ public class MovieController {
     public ResponseEntity<Void> deleteMovie(@PathVariable Long id) {
         movieService.deleteMovie(id);
         return ResponseEntity.noContent().build();
+    }
+    @GetMapping("/now-playing")
+    public ResponseEntity<List<Movie>> getNowPlayingMovies() {
+        return ResponseEntity.ok(movieService.getNowPlayingMovies());
+    }
+
+    @GetMapping("/coming-soon")
+    public ResponseEntity<List<Movie>> getComingSoonMovies() {
+        return ResponseEntity.ok(movieService.getComingSoonMovies());
+    }
+
+    @PutMapping("/{movieId}/availability")
+    public ResponseEntity<String> updateAvailability(
+            @PathVariable Long movieId,
+            @RequestParam boolean available
+    ) {
+        movieService.updateMovieAvailability(movieId, available);
+        return ResponseEntity.ok("Movie availability updated successfully");
     }
 }

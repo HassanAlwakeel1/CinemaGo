@@ -1,5 +1,6 @@
 package com.CinemaGo.model.mapper.impl;
 
+import com.CinemaGo.model.dto.ShowtimeDTO;
 import com.CinemaGo.model.dto.ShowtimeRequest;
 import com.CinemaGo.model.dto.ShowtimeResponse;
 import com.CinemaGo.model.entity.Hall;
@@ -64,6 +65,20 @@ public class ShowtimeMapperImpl implements ShowtimeMapper {
         Hall hall = new Hall();
         hall.setId(request.getHallId());
         showtime.setHall(hall);
+    }
+    @Override
+    public ShowtimeDTO toDto(Showtime showtime) {
+        ShowtimeDTO dto = modelMapper.map(showtime, ShowtimeDTO.class);
+
+        // enrich with movie title & hall name if available
+        if (showtime.getMovie() != null) {
+            dto.setMovieTitle(showtime.getMovie().getTitle());
+        }
+        if (showtime.getHall() != null) {
+            dto.setHallName(showtime.getHall().getName());
+        }
+
+        return dto;
     }
 
 }

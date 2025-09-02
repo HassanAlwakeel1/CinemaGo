@@ -20,4 +20,5 @@ public class MovieDTO {
     private String language;
     private Boolean subtitlesAvailable;
     private String subtitleLanguage;
+    private Boolean available;
 }

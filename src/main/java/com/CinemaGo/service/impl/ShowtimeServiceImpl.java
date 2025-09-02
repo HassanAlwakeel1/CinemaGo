@@ -1,5 +1,6 @@
 package com.CinemaGo.service.impl;
 
+import com.CinemaGo.model.dto.ShowtimeDTO;
 import com.CinemaGo.model.dto.ShowtimeRequest;
 import com.CinemaGo.model.dto.ShowtimeResponse;
 import com.CinemaGo.model.entity.Hall;
@@ -13,6 +14,8 @@ import com.CinemaGo.service.ShowtimeService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -79,5 +82,33 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     @Override
     public void deleteShowtime(Long id) {
         showtimeRepository.deleteById(id);
+    }
+
+    @Override
+    public List<ShowtimeResponse> getShowtimesByMovie(Long movieId) {
+        List<Showtime> showtimes = showtimeRepository.findByMovieId(movieId);
+        return showtimes.stream()
+                .map(showtimeMapper::toResponse)
+                .toList();
+    }
+    @Override
+    public List<ShowtimeDTO> filterShowtimes(Long movieId,
+                                             Long hallId,
+                                             String language,
+                                             String format,
+                                             LocalDateTime startAfter,
+                                             LocalDateTime endBefore) {
+
+        List<Showtime> showtimes = showtimeRepository.findAll();
+
+        return showtimes.stream()
+                .filter(s -> movieId == null || s.getMovie().getId().equals(movieId))
+                .filter(s -> hallId == null || s.getHall().getId().equals(hallId))
+                .filter(s -> language == null || s.getLanguage().equalsIgnoreCase(language))
+                .filter(s -> format == null || s.getFormat().equalsIgnoreCase(format))
+                .filter(s -> startAfter == null || s.getStartTime().isAfter(startAfter))
+                .filter(s -> endBefore == null || s.getEndTime().isBefore(endBefore))
+                .map(showtimeMapper::toDto)
+                .collect(Collectors.toList());
     }
 }

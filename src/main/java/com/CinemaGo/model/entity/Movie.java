@@ -32,6 +32,8 @@ public class Movie {
     private String language;
     private Boolean subtitlesAvailable = false;
     private String subtitleLanguage;
+    private Boolean available = true;
+
 
     @OneToMany(mappedBy = "movie", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Showtime> showtimes;

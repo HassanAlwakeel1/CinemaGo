@@ -78,7 +78,7 @@ public class SeatReservationServiceImpl implements SeatReservationService {
                 .filter(r -> status == null || (r.getStatus() != null && r.getStatus().equalsIgnoreCase(status)))
                 .map(mapper::toAdminDto)
                 .toList();
-    }   
+    }
 
     @Override
     public ReservationResponse updateReservationStatus(Long id, String status) {
