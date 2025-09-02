@@ -10,4 +10,7 @@ public interface SeatReservationRepository extends JpaRepository<SeatReservation
     List<SeatReservation> findByShowtimeId(Long showtimeId);
     Optional<SeatReservation> findByShowtimeIdAndSeatId(Long showtimeId, Long seatId);
     boolean existsByShowtimeIdAndSeatId(Long showtimeId, Long seatId);
+
+    List<SeatReservation> findByUserId(Long userId);
+
 }

@@ -22,9 +22,16 @@ public class SeatReservationController {
         return ResponseEntity.ok(response);
     }
 
-    @GetMapping()
-    public ResponseEntity<List<ReservationAdminResponse>> getAllReservationsForAdmin() {
-        List<ReservationAdminResponse> reservations = seatReservationService.getAllReservationsForAdmin();
+    @GetMapping
+    public ResponseEntity<List<ReservationAdminResponse>> getReservations(
+            @RequestParam(required = false) Long userId,
+            @RequestParam(required = false) Long showtimeId,
+            @RequestParam(required = false) Long movieId,
+            @RequestParam(required = false) String status
+    ) {
+        List<ReservationAdminResponse> reservations = seatReservationService.getReservationsByFilters(
+                userId, showtimeId, movieId, status
+        );
         return ResponseEntity.ok(reservations);
     }
 
@@ -42,5 +49,11 @@ public class SeatReservationController {
     public ResponseEntity<String> deleteReservation(@PathVariable Long id) {
         seatReservationService.deleteReservation(id);
         return ResponseEntity.ok("Reservation deleted successfully");
+    }
+
+    @GetMapping("/user/{userId}")
+    public ResponseEntity<List<ReservationResponse>> getReservationsByUser(@PathVariable Long userId) {
+        List<ReservationResponse> reservations = seatReservationService.getReservationsByUser(userId);
+        return ResponseEntity.ok(reservations);
     }
 }

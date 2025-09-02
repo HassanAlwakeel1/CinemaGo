@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,11 +66,19 @@ public class SeatReservationServiceImpl implements SeatReservationService {
     }
 
     @Override
-    public List<ReservationAdminResponse> getAllReservationsForAdmin() {
-        return reservationRepository.findAll().stream()
+    public List<ReservationAdminResponse> getReservationsByFilters(Long userId, Long showtimeId, Long movieId, String status) {
+        List<SeatReservation> reservations = reservationRepository.findAll();
+
+        return reservations.stream()
+                .filter(r -> userId == null || (r.getUser() != null && r.getUser().getId().equals(userId)))
+                .filter(r -> showtimeId == null || (r.getShowtime() != null && r.getShowtime().getId().equals(showtimeId)))
+                .filter(r -> movieId == null ||
+                        (r.getShowtime() != null && r.getShowtime().getMovie() != null
+                                && r.getShowtime().getMovie().getId().equals(movieId)))
+                .filter(r -> status == null || (r.getStatus() != null && r.getStatus().equalsIgnoreCase(status)))
                 .map(mapper::toAdminDto)
-                .collect(Collectors.toList());
-    }
+                .toList();
+    }   
 
     @Override
     public ReservationResponse updateReservationStatus(Long id, String status) {
@@ -86,5 +93,18 @@ public class SeatReservationServiceImpl implements SeatReservationService {
         SeatReservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
         reservationRepository.delete(reservation);
+    }
+
+    @Override
+    public List<ReservationResponse> getReservationsByUser(Long userId) {
+        List<SeatReservation> reservations = reservationRepository.findByUserId(userId);
+
+        return reservations.stream()
+                .map(reservation -> ReservationResponse.builder()
+                        .reservationId(reservation.getId())
+                        .status(reservation.getStatus())
+                        .message("Reservation retrieved successfully")
+                        .build())
+                .toList();
     }
 }
