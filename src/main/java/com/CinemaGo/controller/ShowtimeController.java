@@ -37,13 +37,6 @@ public class ShowtimeController {
         return ResponseEntity.ok(response);
     }
 
-    // Read all
-//    @GetMapping
-//    public ResponseEntity<List<ShowtimeResponse>> getAllShowtimes() {
-//        List<ShowtimeResponse> responses = showtimeService.getAllShowtimes();
-//        return ResponseEntity.ok(responses);
-//    }
-
     // Update
     @PutMapping("/{id}")
     public ResponseEntity<ShowtimeResponse> updateShowtime(@PathVariable Long id,
