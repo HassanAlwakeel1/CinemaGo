@@ -11,15 +11,12 @@ import com.stripe.model.PaymentIntent;
 import com.stripe.model.StripeObject;
 import com.stripe.model.checkout.Session;
 import com.stripe.net.Webhook;
-import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/webhooks")
@@ -45,6 +42,7 @@ public class StripeWebhookController {
 
         try {
             event = Webhook.constructEvent(payload, sigHeader, endpointSecret);
+            logger.info("Received Stripe event: " + event.getType());
         } catch (SignatureVerificationException e) {
             logger.warn("⚠️ Stripe signature verification failed", e);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Signature verification failed");

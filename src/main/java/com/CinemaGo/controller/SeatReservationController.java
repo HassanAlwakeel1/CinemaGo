@@ -8,18 +8,28 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/v1/seatReservations")
 @RequiredArgsConstructor
 public class SeatReservationController {
     private final SeatReservationService seatReservationService;
+    private static final Logger logger = Logger.getLogger(SeatReservationController.class.getName());
+
 
     // Get a reservation by ID
     @GetMapping("/{id}")
     public ResponseEntity<ReservationAdminResponse> getReservationForAdmin(@PathVariable Long id) {
-        ReservationAdminResponse response = seatReservationService.getReservationByIdForAdmin(id);
-        return ResponseEntity.ok(response);
+        try {
+            ReservationAdminResponse response = seatReservationService.getReservationByIdForAdmin(id);
+            logger.info("Fetched reservation for admin with ID: " + id);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to fetch reservation for admin with ID: " + id, e);
+            throw e;
+        }
     }
 
     @GetMapping
@@ -29,10 +39,18 @@ public class SeatReservationController {
             @RequestParam(required = false) Long movieId,
             @RequestParam(required = false) String status
     ) {
-        List<ReservationAdminResponse> reservations = seatReservationService.getReservationsByFilters(
-                userId, showtimeId, movieId, status
-        );
-        return ResponseEntity.ok(reservations);
+        try {
+            List<ReservationAdminResponse> reservations = seatReservationService.getReservationsByFilters(
+                    userId, showtimeId, movieId, status
+            );
+            logger.info("Fetched " + reservations.size() + " reservations with filters: " +
+                    "userId=" + userId + ", showtimeId=" + showtimeId +
+                    ", movieId=" + movieId + ", status=" + status);
+            return ResponseEntity.ok(reservations);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to fetch reservations with filters", e);
+            throw e;
+        }
     }
 
     // Update reservation status (e.g., cancel a reservation)
@@ -40,20 +58,38 @@ public class SeatReservationController {
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long id,
             @RequestParam String status) {
-        ReservationResponse response = seatReservationService.updateReservationStatus(id, status);
-        return ResponseEntity.ok(response);
+        try {
+            ReservationResponse response = seatReservationService.updateReservationStatus(id, status);
+            logger.info("Updated reservation ID " + id + " status to " + status);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to update reservation ID " + id + " status to " + status, e);
+            throw e;
+        }
     }
 
     // Delete a reservation
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long id) {
-        seatReservationService.deleteReservation(id);
-        return ResponseEntity.ok("Reservation deleted successfully");
+        try {
+            seatReservationService.deleteReservation(id);
+            logger.info("Deleted reservation with ID: " + id);
+            return ResponseEntity.ok("Reservation deleted successfully");
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to delete reservation with ID: " + id, e);
+            throw e;
+        }
     }
 
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ReservationResponse>> getReservationsByUser(@PathVariable Long userId) {
-        List<ReservationResponse> reservations = seatReservationService.getReservationsByUser(userId);
-        return ResponseEntity.ok(reservations);
+        try {
+            List<ReservationResponse> reservations = seatReservationService.getReservationsByUser(userId);
+            logger.info("Fetched " + reservations.size() + " reservations for user ID: " + userId);
+            return ResponseEntity.ok(reservations);
+        } catch (Exception e) {
+            logger.log(Level.SEVERE, "Failed to fetch reservations for user ID: " + userId, e);
+            throw e;
+        }
     }
 }

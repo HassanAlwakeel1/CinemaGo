@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 @RestController
 @RequestMapping("/api/payments")
@@ -17,6 +18,8 @@ import java.util.Map;
 public class PaymentController {
 
     private final SeatReservationService reservationService;
+    private static final Logger logger = Logger.getLogger(PaymentController.class.getName());
+
 
     @Value("${stripe.public.key}")
     private String publicKey;
@@ -25,6 +28,7 @@ public class PaymentController {
     public Map<String, Object> createCheckoutSession(@RequestBody ReservationRequest request) throws Exception {
         // create reservation with PENDING status
         var reservationResponse = reservationService.reserveSeat(request);
+        logger.info("Created reservation with ID: " + reservationResponse.getReservationId());
 
         SessionCreateParams params =
                 SessionCreateParams.builder()
@@ -51,6 +55,7 @@ public class PaymentController {
                         .build();
 
         Session session = Session.create(params);
+        logger.info("Created Stripe checkout session with ID: " + session.getId());
 
         Map<String, Object> responseData = new HashMap<>();
         responseData.put("id", session.getId());
