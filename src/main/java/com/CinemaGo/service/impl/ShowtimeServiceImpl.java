@@ -12,6 +12,8 @@ import com.CinemaGo.repository.MovieRepository;
 import com.CinemaGo.repository.ShowtimeRepository;
 import com.CinemaGo.service.ShowtimeService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -28,8 +30,14 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     private final HallRepository hallRepository;
     private final ShowtimeMapper showtimeMapper;
 
+    private final Logger logger = LoggerFactory.getLogger(ShowtimeServiceImpl.class);
+
     @Override
     public ShowtimeResponse createShowtime(ShowtimeRequest request) {
+        logger.info("Creating showtime for movie ID: " + request.getMovieId() +
+                " in hall ID: " + request.getHallId() +
+                " at: " + request.getStartTime());
+
         Movie movie = movieRepository.findById(request.getMovieId())
                 .orElseThrow(() -> new RuntimeException("Movie not found"));
         Hall hall = hallRepository.findById(request.getHallId())
@@ -40,25 +48,34 @@ public class ShowtimeServiceImpl implements ShowtimeService {
         showtime.setHall(hall);
 
         Showtime saved = showtimeRepository.save(showtime);
+        logger.info("Created showtime for movie ID: " + request.getMovieId() +
+                " in hall ID: " + request.getHallId() +
+                " at: " + request.getStartTime());
         return showtimeMapper.toResponse(saved);
     }
 
     @Override
     public ShowtimeResponse getShowtime(Long id) {
+        logger.info("Getting showtime with ID: " + id);
         Showtime showtime = showtimeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Showtime not found"));
+        logger.info("Got showtime with ID: " + id);
         return showtimeMapper.toResponse(showtime);
     }
 
     @Override
     public List<ShowtimeResponse> getAllShowtimes() {
-        return showtimeRepository.findAll().stream()
+        logger.info("Getting all showtimes");
+        List<Showtime> showtimes = showtimeRepository.findAll();
+        logger.info("Got all showtimes");
+        return showtimes.stream()
                 .map(showtimeMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     @Override
     public ShowtimeResponse updateShowtime(Long id, ShowtimeRequest request) {
+        logger.info("Updating showtime with ID: " + id);
         Showtime showtime = showtimeRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Showtime not found"));
 

@@ -13,6 +13,8 @@ import com.CinemaGo.repository.UserRepository;
 import com.CinemaGo.service.SeatReservationService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -23,6 +25,8 @@ import java.util.List;
 @Transactional
 public class SeatReservationServiceImpl implements SeatReservationService {
 
+    private static final Logger logger = LoggerFactory.getLogger(SeatReservationServiceImpl.class);
+
     private final SeatReservationRepository reservationRepository;
     private final ShowtimeRepository showtimeRepository;
     private final SeatRepository seatRepository;
@@ -32,7 +36,9 @@ public class SeatReservationServiceImpl implements SeatReservationService {
 
     @Override
     public ReservationResponse reserveSeat(ReservationRequest request) {
+        logger.info("Reserving seat with request: " + request);
         if (reservationRepository.existsByShowtimeIdAndSeatId(request.getShowtimeId(), request.getSeatId())) {
+            logger.info("Seat already reserved");
             return ReservationResponse.builder()
                     .status("FAILED")
                     .message("Seat already reserved")
@@ -50,6 +56,7 @@ public class SeatReservationServiceImpl implements SeatReservationService {
                 .build();
 
         reservationRepository.save(reservation);
+        logger.info("Reservation created with id: " + reservation.getId());
 
         return ReservationResponse.builder()
                 .reservationId(reservation.getId())
@@ -62,11 +69,13 @@ public class SeatReservationServiceImpl implements SeatReservationService {
     public ReservationAdminResponse getReservationByIdForAdmin(Long id) {
         SeatReservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
+        logger.info("Fetched reservation with id: " + id);
         return mapper.toAdminDto(reservation);
     }
 
     @Override
     public List<ReservationAdminResponse> getReservationsByFilters(Long userId, Long showtimeId, Long movieId, String status) {
+        logger.info("Fetching reservations by filters: userId=" + userId + ", showtimeId=" + showtimeId + ", movieId=" + movieId + ", status=" + status);
         List<SeatReservation> reservations = reservationRepository.findAll();
 
         return reservations.stream()
@@ -82,6 +91,7 @@ public class SeatReservationServiceImpl implements SeatReservationService {
 
     @Override
     public ReservationResponse updateReservationStatus(Long id, String status) {
+        logger.info("Updating reservation status with id: " + id + " to status: " + status);
         SeatReservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
         reservation.setStatus(status);
@@ -90,6 +100,7 @@ public class SeatReservationServiceImpl implements SeatReservationService {
 
     @Override
     public void deleteReservation(Long id) {
+        logger.info("Deleting reservation with id: " + id);
         SeatReservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
         reservationRepository.delete(reservation);
@@ -97,6 +108,7 @@ public class SeatReservationServiceImpl implements SeatReservationService {
 
     @Override
     public List<ReservationResponse> getReservationsByUser(Long userId) {
+        logger.info("Fetching reservations by userId: " + userId);
         List<SeatReservation> reservations = reservationRepository.findByUserId(userId);
 
         return reservations.stream()

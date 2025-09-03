@@ -7,6 +7,8 @@ import com.CinemaGo.model.mapper.UserMapper;
 import com.CinemaGo.repository.UserRepository;
 import com.CinemaGo.service.CloudinaryImageService;
 import com.CinemaGo.service.UserService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,6 +24,8 @@ import java.util.Map;
 
 @Service
 public class UserServiceImpl implements UserService {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(UserServiceImpl.class);
 
     private UserRepository userRepository;
 
@@ -45,6 +49,7 @@ public class UserServiceImpl implements UserService {
         return new UserDetailsService() {
             @Override
             public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+                LOGGER.info("Loading user by email: {}", email);
                 return userRepository.findByEmail(email)
                         .orElseThrow(()-> new UsernameNotFoundException("User not found"));
             }
@@ -52,34 +57,16 @@ public class UserServiceImpl implements UserService {
     }
 
     public ResponseEntity<UserDTO> getUserById(Long userId){
+        LOGGER.info("Getting user by id: {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
         UserDTO userDTO =  userMapper.userToUserDTO(user);
         return ResponseEntity.ok(userDTO);
     }
 
-
-//    @Override
-//    public ResponseEntity<UserProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId) {
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
-//
-//        user.setFirstName(userProfileDTO.getFirstName());
-//        user.setLastName(userProfileDTO.getLastName());
-//        user.setBio(userProfileDTO.getBio());
-//        MultipartFile photo = userProfileDTO.getProfilePicture();
-//        if (photo != null && !photo.isEmpty()) {
-//            Map uploadImageMap = cloudinaryImageService.upload(photo);
-//            String photoUrl = (String)uploadImageMap.get("secure_url");
-//            user.setProfilePictureURL(photoUrl);
-//        }
-//        userRepository.save(user);
-//        UserProfileDTO updatedUserProfileDTO = userMapper.userToUpdatedProfileDTO(user);
-//        return ResponseEntity.ok(updatedUserProfileDTO);
-//    }
-
     @Override
     public ResponseEntity<UserProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId) {
+        LOGGER.info("Updating user profile for user id: {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
@@ -95,6 +82,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<ProfileDTO> updateProfilePicture(Long userId, MultipartFile photo) {
+        LOGGER.info("Updating profile picture for user id: {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User", "id", userId));
 
@@ -105,14 +93,14 @@ public class UserServiceImpl implements UserService {
         }
 
         userRepository.save(user);
+
         ProfileDTO updatedProfileDTO = userMapper.userToProfileDTO(user);
         return ResponseEntity.ok(updatedProfileDTO);
     }
 
-
-
     @Override
     public ResponseEntity<String> deleteUser(Long userId) {
+        LOGGER.info("Deleting user with id: {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
         userRepository.delete(user);
@@ -121,6 +109,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<List<CustomUserDTO>> getAllUsers() {
+        LOGGER.info("Getting all users");
         List<User> users = userRepository.findAll();
         List<CustomUserDTO> customUserDTOS = new ArrayList<>();
         for (User user : users) {
@@ -132,6 +121,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public ResponseEntity<String> changePassword(ChangePasswordDTO changePasswordDTO, Long userId) {
+        LOGGER.info("Changing password for user id: {}", userId);
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new ResourceNotFoundException("User","id",userId));
         String userPassword = user.getPassword();
@@ -145,5 +135,3 @@ public class UserServiceImpl implements UserService {
         }else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Bad credentials");
     }
 }
-
-

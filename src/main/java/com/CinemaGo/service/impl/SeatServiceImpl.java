@@ -10,6 +10,8 @@ import com.CinemaGo.repository.HallRepository;
 import com.CinemaGo.repository.SeatRepository;
 import com.CinemaGo.service.SeatService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -21,22 +23,25 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SeatServiceImpl implements SeatService {
 
+    private final Logger logger = LoggerFactory.getLogger(SeatServiceImpl.class);
+
     private final SeatRepository seatRepository;
     private final HallRepository hallRepository;
     private final SeatMapper seatMapper;
 
     @Override
     public SeatResponseDto createSeat(SeatRequestDto dto) {
+        logger.info("Creating seat with DTO: {}", dto);
+
         Hall hall = hallRepository.findById(dto.getHallId())
                 .orElseThrow(() -> new ResourceNotFoundException("Hall", "id", dto.getHallId()));
 
         boolean exists = seatRepository.existsByHallAndSeatNumber(hall, dto.getSeatNumber());
 
         if (exists) {
-            throw new ResponseStatusException(
-                    HttpStatus.BAD_REQUEST,
-                    "Seat number " + dto.getSeatNumber() + " already exists in this hall"
-            );
+            String errorMessage = "Seat number " + dto.getSeatNumber() + " already exists in this hall";
+            logger.error(errorMessage);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
         }
 
         Seat seat = seatMapper.toEntity(dto);
@@ -44,26 +49,36 @@ public class SeatServiceImpl implements SeatService {
         seat.setHall(hall);
 
         Seat savedSeat = seatRepository.save(seat);
+        logger.info("Created seat with ID: {}", savedSeat.getId());
         return seatMapper.toDto(savedSeat);
     }
 
     @Override
     public List<SeatResponseDto> getSeatsByHallId(Long hallId) {
+        logger.info("Fetching seats for hall ID: {}", hallId);
+
         Hall hall = hallRepository.findById(hallId)
                 .orElseThrow(() -> new ResourceNotFoundException("Hall", "id", hallId));
 
         List<Seat> seats = seatRepository.findByHall(hall);
+        logger.info("Fetched {} seats for hall ID: {}", seats.size(), hallId);
         return seats.stream().map(seatMapper::toDto).collect(Collectors.toList());
     }
+
     @Override
     public SeatResponseDto getSeatById(Long id) {
+        logger.info("Fetching seat with ID: {}", id);
+
         Seat seat = seatRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Seat", "id", id));
+        logger.info("Fetched seat with ID: {}", seat.getId());
         return seatMapper.toDto(seat);
     }
 
     @Override
     public SeatResponseDto updateSeat(Long id, SeatRequestDto dto) {
+        logger.info("Updating seat with ID: {} and DTO: {}", id, dto);
+
         Seat seat = seatRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Seat", "id", id));
 
@@ -77,13 +92,17 @@ public class SeatServiceImpl implements SeatService {
         }
 
         Seat savedSeat = seatRepository.save(seat);
+        logger.info("Updated seat with ID: {}", savedSeat.getId());
         return seatMapper.toDto(savedSeat);
     }
 
     @Override
     public void deleteSeat(Long id) {
+        logger.info("Deleting seat with ID: {}", id);
+
         Seat seat = seatRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Seat", "id", id));
         seatRepository.delete(seat);
+        logger.info("Deleted seat with ID: {}", id);
     }
 }

@@ -6,6 +6,8 @@ import com.CinemaGo.model.entity.Person;
 import com.CinemaGo.repository.PersonRepository;
 import com.CinemaGo.service.PersonService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,10 +16,12 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PersonServiceImpl implements PersonService {
 
+    private static final Logger logger = LoggerFactory.getLogger(PersonServiceImpl.class);
     private final PersonRepository personRepository;
 
     @Override
     public PersonResponseDTO createPerson(PersonRequestDTO dto) {
+        logger.info("Creating person with id: {}", dto.getFirstName()+" "+dto.getLastName());
         Person person = Person.builder()
                 .firstName(dto.getFirstName())
                 .lastName(dto.getLastName())
@@ -27,6 +31,7 @@ public class PersonServiceImpl implements PersonService {
 
         Person saved = personRepository.save(person);
 
+        logger.info("Saved person with id: {}", saved.getId());
         return PersonResponseDTO.builder()
                 .id(saved.getId())
                 .firstName(saved.getFirstName())
@@ -38,17 +43,20 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public Person getPersonById(Long id) {
+        logger.info("Fetching person with id: {}", id);
         return personRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Person not found with id " + id));
     }
 
     @Override
     public List<Person> getAllPersons() {
+        logger.info("Fetching all persons");
         return personRepository.findAll();
     }
 
     @Override
     public PersonResponseDTO updatePerson(Long id, PersonRequestDTO dto) {
+        logger.info("Updating person with id: {}", id);
         // Fetch existing person
         Person existing = getPersonById(id);
 
@@ -61,6 +69,7 @@ public class PersonServiceImpl implements PersonService {
         // Save updated entity
         Person updated = personRepository.save(existing);
 
+        logger.info("Updated person with id: {}", updated.getId());
         // Return as DTO
         return PersonResponseDTO.builder()
                 .id(updated.getId())
@@ -73,6 +82,7 @@ public class PersonServiceImpl implements PersonService {
 
     @Override
     public void deletePerson(Long id) {
+        logger.info("Deleting person with id: {}", id);
         Person existing = getPersonById(id);
         personRepository.delete(existing);
     }

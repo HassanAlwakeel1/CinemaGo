@@ -10,6 +10,8 @@ import com.CinemaGo.repository.MovieRepository;
 import com.CinemaGo.repository.PersonRepository;
 import com.CinemaGo.service.MovieCrewService;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +20,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class MovieCrewServiceImpl implements MovieCrewService {
+
+    private static final Logger logger = LoggerFactory.getLogger(MovieCrewServiceImpl.class);
 
     private final MovieCrewRepository movieCrewRepository;
     private final MovieRepository movieRepository;
@@ -37,10 +41,21 @@ public class MovieCrewServiceImpl implements MovieCrewService {
 
     @Override
     public MovieCrewResponseDTO addPersonToMovie(MovieCrewRequestDTO dto) {
+        logger.info("Adding person with ID {} to movie with ID {} as {}", 
+            dto.getPersonId(), dto.getMovieId(), dto.getRole());
+            
         Movie movie = movieRepository.findById(dto.getMovieId())
-                .orElseThrow(() -> new RuntimeException("Movie not found with id " + dto.getMovieId()));
+                .orElseThrow(() -> {
+                    String error = "Movie not found with id " + dto.getMovieId();
+                    logger.error(error);
+                    return new RuntimeException(error);
+                });
         Person person = personRepository.findById(dto.getPersonId())
-                .orElseThrow(() -> new RuntimeException("Person not found with id " + dto.getPersonId()));
+                .orElseThrow(() -> {
+                    String error = "Person not found with id " + dto.getPersonId();
+                    logger.error(error);
+                    return new RuntimeException(error);
+                });
 
         MovieCrew crew = MovieCrew.builder()
                 .movie(movie)
@@ -50,13 +65,22 @@ public class MovieCrewServiceImpl implements MovieCrewService {
                 .build();
 
         MovieCrew saved = movieCrewRepository.save(crew);
+        logger.debug("Successfully added person {} to movie {} with role {}", 
+            person.getFirstName() + " " + person.getLastName(), 
+            movie.getTitle(), 
+            dto.getRole());
         return mapToDTO(saved);
     }
 
     @Override
     public MovieCrewResponseDTO getById(Long id) {
+        logger.debug("Fetching movie crew with ID: {}", id);
         MovieCrew crew = movieCrewRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MovieCrew not found with id " + id));
+                .orElseThrow(() -> {
+                    String error = "MovieCrew not found with id " + id;
+                    logger.warn(error);
+                    return new RuntimeException(error);
+                });
         return mapToDTO(crew);
     }
 
@@ -69,34 +93,52 @@ public class MovieCrewServiceImpl implements MovieCrewService {
 
     @Override
     public List<MovieCrewResponseDTO> getByMovie(Long movieId) {
-        return movieCrewRepository.findByMovieId(movieId).stream()
+        logger.debug("Fetching all crew for movie ID: {}", movieId);
+        List<MovieCrewResponseDTO> result = movieCrewRepository.findByMovieId(movieId).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+        logger.trace("Found {} crew members for movie ID: {}", result.size(), movieId);
+        return result;
     }
 
     @Override
     public List<MovieCrewResponseDTO> getByPerson(Long personId) {
-        return movieCrewRepository.findByPersonId(personId).stream()
+        logger.debug("Fetching all movies for person ID: {}", personId);
+        List<MovieCrewResponseDTO> result = movieCrewRepository.findByPersonId(personId).stream()
                 .map(this::mapToDTO)
                 .collect(Collectors.toList());
+        logger.trace("Found {} movies for person ID: {}", result.size(), personId);
+        return result;
     }
 
     @Override
     public MovieCrewResponseDTO updateMovieCrew(Long id, MovieCrewRequestDTO dto) {
+        logger.info("Updating movie crew with ID: {}", id);
         MovieCrew existing = movieCrewRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MovieCrew not found with id " + id));
+                .orElseThrow(() -> {
+                    String error = "MovieCrew not found with id " + id;
+                    logger.error(error);
+                    return new RuntimeException(error);
+                });
 
         if (dto.getRole() != null) existing.setRole(dto.getRole());
         existing.setCharacterName(dto.getCharacterName());
 
         MovieCrew updated = movieCrewRepository.save(existing);
+        logger.debug("Successfully updated movie crew with ID: {}", id);
         return mapToDTO(updated);
     }
 
     @Override
     public void removeFromMovie(Long id) {
+        logger.info("Attempting to remove movie crew with ID: {}", id);
         MovieCrew existing = movieCrewRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("MovieCrew not found with id " + id));
+                .orElseThrow(() -> {
+                    String error = "MovieCrew not found with id " + id;
+                    logger.warn(error);
+                    return new RuntimeException(error);
+                });
         movieCrewRepository.delete(existing);
+        logger.debug("Successfully removed movie crew with ID: {}", id);
     }
 }

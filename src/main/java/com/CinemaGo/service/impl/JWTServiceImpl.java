@@ -6,6 +6,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
@@ -17,8 +19,10 @@ import java.util.function.Function;
 
 @Service
 public class JWTServiceImpl implements JWTService {
-    public String generateToken(UserDetails userDetails){
+    private static final Logger logger = LogManager.getLogger(JWTServiceImpl.class);
 
+    public String generateToken(UserDetails userDetails){
+        logger.debug("Generating JWT token for user {}", userDetails.getUsername());
         //Set expiration time to 3 months
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(new Date());
@@ -34,6 +38,7 @@ public class JWTServiceImpl implements JWTService {
 
     public String generateRefreshToken(HashMap<String, Object> extraClaims,
                                        UserDetails userDetails) {
+        logger.debug("Generating refresh JWT token for user {}", userDetails.getUsername());
         return Jwts.builder().setClaims(extraClaims).setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + 604800000))
@@ -64,6 +69,7 @@ public class JWTServiceImpl implements JWTService {
 
     public boolean isTokenValid(String token , UserDetails userDetails){
         final String username = extractUserName(token);
+        logger.debug("Checking if token for user {} is valid", username);
         return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
     }
 
