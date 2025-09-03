@@ -16,6 +16,9 @@ import com.CinemaGo.service.JWTService;
 import com.CinemaGo.service.VerificationTokenService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -106,6 +109,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         logger.fine("JWT token saved for user: " + user.getId());
     }
 
+    @CachePut(value = "USER_CACHE", key = "#result.token")
     public JwtAuthenticationResponse signin(SignInRequest signinRequest){
         logger.info("Authenticating user: " + signinRequest.getEmail());
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),
@@ -143,6 +147,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         logger.fine("Revoked " + validUserTokens.size() + " tokens for user ID: " + user.getId());
     }
 
+    @Cacheable(value = "USER_CACHE", key = "#refreshTokenRequest.token")
     public JwtAuthenticationResponse refreshToken(RefreshTokenRequest refreshTokenRequest)  {
         logger.info("Refreshing token...");
         String userEmail = jwtService.extractUserName(refreshTokenRequest.getToken());
@@ -200,6 +205,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
     @Override
+    @CacheEvict(value = "USER_CACHE", key = "#token") // evict after password reset
     public void resetPassword(String token, String newPassword) {
         logger.info("Resetting password with token: " + token);
         Optional<PasswordResetToken> tokenOptional = passwordResetTokenRepository.findByToken(token);

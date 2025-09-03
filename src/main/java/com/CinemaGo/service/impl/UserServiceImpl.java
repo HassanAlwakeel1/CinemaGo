@@ -9,6 +9,10 @@ import com.CinemaGo.service.CloudinaryImageService;
 import com.CinemaGo.service.UserService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,6 +60,7 @@ public class UserServiceImpl implements UserService {
         };
     }
 
+    @Cacheable(value = "USER_CACHE", key = "#userId")
     public ResponseEntity<UserDTO> getUserById(Long userId){
         LOGGER.info("Getting user by id: {}", userId);
         User user = userRepository.findById(userId)
@@ -65,6 +70,14 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(
+            put = {
+                    @CachePut(value = "USER_CACHE", key = "#userId")
+            },
+            evict = {
+                    @CacheEvict(value = "ALL_USERS_CACHE", allEntries = true)
+            }
+    )
     public ResponseEntity<UserProfileDTO> updateUserProfile(UserProfileDTO userProfileDTO, Long userId) {
         LOGGER.info("Updating user profile for user id: {}", userId);
         User user = userRepository.findById(userId)
@@ -99,6 +112,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Caching(
+            evict = {
+                    @CacheEvict(value = "USER_CACHE", key = "#userId"),
+                    @CacheEvict(value = "ALL_USERS_CACHE", allEntries = true)
+            }
+    )
     public ResponseEntity<String> deleteUser(Long userId) {
         LOGGER.info("Deleting user with id: {}", userId);
         User user = userRepository.findById(userId)
@@ -108,6 +127,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Cacheable(value = "ALL_USERS_CACHE")
     public ResponseEntity<List<CustomUserDTO>> getAllUsers() {
         LOGGER.info("Getting all users");
         List<User> users = userRepository.findAll();

@@ -8,6 +8,10 @@ import com.CinemaGo.model.mapper.HallMapper;
 import com.CinemaGo.repository.HallRepository;
 import com.CinemaGo.service.HallService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.CachePut;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -25,6 +29,8 @@ public class HallServiceImpl implements HallService {
     private final HallMapper hallMapper;
 
     @Override
+    @CachePut(value = "HALL_CACHE", key = "#result.id()")
+    @CacheEvict(value = "HALL_LIST_CACHE", allEntries = true)
     public HallResponseDto createHall(HallRequestDto dto) {
         logger.info("Creating new hall with name: " + dto.getName());
         Hall hall = hallMapper.toEntity(dto);
@@ -34,6 +40,7 @@ public class HallServiceImpl implements HallService {
     }
 
     @Override
+    @Cacheable(value = "HALL_CACHE", key = "#id")
     public HallResponseDto getHallById(Long id) {
         logger.info("Fetching hall with ID: " + id);
         Hall hall = hallRepository.findById(id).
@@ -46,6 +53,7 @@ public class HallServiceImpl implements HallService {
     }
 
     @Override
+    @Cacheable(value = "HALL_LIST_CACHE")
     public List<HallResponseDto> getAllHalls() {
         logger.info("Fetching all halls");
         List<HallResponseDto> halls = hallRepository.findAll().stream()
@@ -56,6 +64,8 @@ public class HallServiceImpl implements HallService {
     }
 
     @Override
+    @CachePut(value = "HALL_CACHE", key = "#result.id()")
+    @CacheEvict(value = "HALL_LIST_CACHE", allEntries = true)
     public HallResponseDto updateHall(Long id, HallRequestDto dto) {
         logger.info("Updating hall with ID: " + id);
         Hall hall = hallRepository.findById(id)
@@ -80,6 +90,10 @@ public class HallServiceImpl implements HallService {
 
 
     @Override
+    @Caching(evict = {
+            @CacheEvict(value = "HALL_CACHE", key = "#id"),
+            @CacheEvict(value = "HALL_LIST_CACHE", allEntries = true)
+    })
     public void deleteHall(Long id) {
         logger.info("Request to delete hall with ID: " + id);
         Hall hall = hallRepository.findById(id)
