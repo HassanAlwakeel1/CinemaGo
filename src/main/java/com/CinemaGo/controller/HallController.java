@@ -4,6 +4,7 @@ import com.CinemaGo.model.dto.HallRequestDto;
 import com.CinemaGo.model.dto.HallResponseDto;
 import com.CinemaGo.service.HallService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,7 +26,7 @@ public class HallController {
         logger.info("Request to create a new hall: " + hallRequestDto);
         HallResponseDto createdHall = hallService.createHall(hallRequestDto);
         logger.info("Hall created successfully with ID: " + createdHall.getId());
-        return ResponseEntity.ok(createdHall);
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdHall);
     }
 
     /** Get Hall by ID */
