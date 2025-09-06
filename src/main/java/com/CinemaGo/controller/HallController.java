@@ -3,9 +3,11 @@ package com.CinemaGo.controller;
 import com.CinemaGo.model.dto.HallRequestDto;
 import com.CinemaGo.model.dto.HallResponseDto;
 import com.CinemaGo.service.HallService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/v1/halls")
 @RequiredArgsConstructor
+@Tag(name = "Hall")
+@CrossOrigin
 public class HallController {
 
     private final HallService hallService;
@@ -21,6 +25,7 @@ public class HallController {
 
 
     /** Create a new Hall */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<HallResponseDto> createHall(@RequestBody HallRequestDto hallRequestDto) {
         logger.info("Request to create a new hall: " + hallRequestDto);
@@ -30,6 +35,7 @@ public class HallController {
     }
 
     /** Get Hall by ID */
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{id}")
     public ResponseEntity<HallResponseDto> getHallById(@PathVariable Long id) {
         logger.info("Request to get hall with ID: " + id);
@@ -39,6 +45,7 @@ public class HallController {
     }
 
     /** Get all Halls */
+    @PreAuthorize("isAuthenticated()")
     @GetMapping
     public ResponseEntity<List<HallResponseDto>> getAllHalls() {
         logger.info("Request to get all halls");
@@ -48,6 +55,7 @@ public class HallController {
     }
 
     /** Update a Hall */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<HallResponseDto> updateHall(
             @PathVariable Long id,
@@ -60,6 +68,7 @@ public class HallController {
     }
 
     /** Delete a Hall */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteHall(@PathVariable Long id) {
         logger.info("Request to delete hall with ID: " + id);

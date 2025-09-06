@@ -3,8 +3,10 @@ package com.CinemaGo.controller;
 import com.CinemaGo.model.dto.ReservationAdminResponse;
 import com.CinemaGo.model.dto.ReservationResponse;
 import com.CinemaGo.service.SeatReservationService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,12 +16,15 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/v1/seatReservations")
 @RequiredArgsConstructor
+@Tag(name = "Seat Reservation")
+@CrossOrigin
 public class SeatReservationController {
     private final SeatReservationService seatReservationService;
     private static final Logger logger = Logger.getLogger(SeatReservationController.class.getName());
 
 
     // Get a reservation by ID
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<ReservationAdminResponse> getReservationForAdmin(@PathVariable Long id) {
         try {
@@ -32,6 +37,7 @@ public class SeatReservationController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<ReservationAdminResponse>> getReservations(
             @RequestParam(required = false) Long userId,
@@ -53,7 +59,7 @@ public class SeatReservationController {
         }
     }
 
-    // Update reservation status (e.g., cancel a reservation)
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<ReservationResponse> updateReservationStatus(
             @PathVariable Long id,
@@ -69,6 +75,7 @@ public class SeatReservationController {
     }
 
     // Delete a reservation
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteReservation(@PathVariable Long id) {
         try {
@@ -81,6 +88,7 @@ public class SeatReservationController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #userId == authentication.principal.id")
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<ReservationResponse>> getReservationsByUser(@PathVariable Long userId) {
         try {

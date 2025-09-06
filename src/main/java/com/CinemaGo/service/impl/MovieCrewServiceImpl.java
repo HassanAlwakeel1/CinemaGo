@@ -76,7 +76,6 @@ public class MovieCrewServiceImpl implements MovieCrewService {
     }
 
     @Override
-    @Cacheable(value = "MOVIE_CREW_CACHE", key = "#id")
     public MovieCrewResponseDTO getById(Long id) {
         logger.debug("Fetching movie crew with ID: {}", id);
         MovieCrew crew = movieCrewRepository.findById(id)
@@ -96,7 +95,6 @@ public class MovieCrewServiceImpl implements MovieCrewService {
     }
 
     @Override
-    @Cacheable(value = "MOVIE_CREW_BY_MOVIE", key = "#movieId")
     public List<MovieCrewResponseDTO> getByMovie(Long movieId) {
         logger.debug("Fetching all crew for movie ID: {}", movieId);
         List<MovieCrewResponseDTO> result = movieCrewRepository.findByMovieId(movieId).stream()
@@ -107,7 +105,6 @@ public class MovieCrewServiceImpl implements MovieCrewService {
     }
 
     @Override
-    @Cacheable(value = "MOVIE_CREW_BY_PERSON", key = "#personId")
     public List<MovieCrewResponseDTO> getByPerson(Long personId) {
         logger.debug("Fetching all movies for person ID: {}", personId);
         List<MovieCrewResponseDTO> result = movieCrewRepository.findByPersonId(personId).stream()
@@ -118,7 +115,6 @@ public class MovieCrewServiceImpl implements MovieCrewService {
     }
 
     @Override
-    @CachePut(value = "MOVIE_CREW_CACHE", key = "#id")
     public MovieCrewResponseDTO updateMovieCrew(Long id, MovieCrewRequestDTO dto) {
         logger.info("Updating movie crew with ID: {}", id);
         MovieCrew existing = movieCrewRepository.findById(id)
@@ -137,7 +133,6 @@ public class MovieCrewServiceImpl implements MovieCrewService {
     }
 
     @Override
-    @CacheEvict(value = {"MOVIE_CREW_CACHE", "MOVIE_CREW_BY_MOVIE", "MOVIE_CREW_BY_PERSON"}, allEntries = true)
     public void removeFromMovie(Long id) {
         logger.info("Attempting to remove movie crew with ID: {}", id);
         MovieCrew existing = movieCrewRepository.findById(id)

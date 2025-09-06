@@ -12,10 +12,6 @@ import com.CinemaGo.service.SeatService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -40,6 +36,13 @@ public class SeatServiceImpl implements SeatService {
         Hall hall = hallRepository.findById(dto.getHallId())
                 .orElseThrow(() -> new ResourceNotFoundException("Hall", "id", dto.getHallId()));
 
+        int currentSeats = seatRepository.countByHall(hall);
+        if (currentSeats >= hall.getTotalSeats()) {
+            String errorMessage = "Hall " + hall.getName() + " has reached its seat capacity (" + hall.getTotalSeats() + ")";
+            logger.error(errorMessage);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, errorMessage);
+        }
+
         boolean exists = seatRepository.existsByHallAndSeatNumber(hall, dto.getSeatNumber());
 
         if (exists) {
@@ -58,7 +61,6 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    @Cacheable(value = "SEATS_BY_HALL", key = "#hallId")
     public List<SeatResponseDto> getSeatsByHallId(Long hallId) {
         logger.info("Fetching seats for hall ID: {}", hallId);
 
@@ -71,7 +73,6 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    @Cacheable(value = "SEAT_CACHE", key = "#id")
     public SeatResponseDto getSeatById(Long id) {
         logger.info("Fetching seat with ID: {}", id);
 
@@ -82,8 +83,6 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    @CachePut(value = "SEAT_CACHE", key = "#id")
-    @CacheEvict(value = "SEATS_BY_HALL", key = "#dto.hallId")
     public SeatResponseDto updateSeat(Long id, SeatRequestDto dto) {
         logger.info("Updating seat with ID: {} and DTO: {}", id, dto);
 
@@ -105,9 +104,6 @@ public class SeatServiceImpl implements SeatService {
     }
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "HALL_CACHE", key = "#id"),
-            @CacheEvict(value = "HALL_LIST_CACHE", allEntries = true)})
     public void deleteSeat(Long id) {
         logger.info("Deleting seat with ID: {}", id);
 

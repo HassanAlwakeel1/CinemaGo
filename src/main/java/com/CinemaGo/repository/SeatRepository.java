@@ -11,5 +11,6 @@ import java.util.List;
 public interface SeatRepository extends JpaRepository<Seat, Long> {
     List<Seat> findByHall(Hall hall);
     boolean existsByHallAndSeatNumber(Hall hall, Integer seatNumber);
+    int countByHall(Hall hall);
 
 }

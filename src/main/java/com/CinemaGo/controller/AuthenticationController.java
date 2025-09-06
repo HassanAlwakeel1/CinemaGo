@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.logging.Level;
@@ -15,14 +16,14 @@ import java.util.logging.Logger;
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 @Tag(name = "Authentication")
+@CrossOrigin
 public class AuthenticationController {
 
     private final AuthenticationService authenticationService;
     private static final Logger logger = Logger.getLogger(AuthenticationController.class.getName());
 
 
-
-
+    @PreAuthorize("permitAll()")
     @PostMapping(value = {"/register","/signup"})
     public ResponseEntity<JwtAuthenticationResponse> signup(@RequestBody SignUpRequest signUpRequest){
         logger.info("Signup attempt for email: " + signUpRequest.getEmail()); // Before calling service
@@ -38,6 +39,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("permitAll()")
     @PostMapping(value = {"/signin","/login"})
     public ResponseEntity<JwtAuthenticationResponse> signin(@RequestBody SignInRequest signInRequest){
         logger.info("Login attempt for email: " + signInRequest.getEmail());
@@ -53,7 +55,7 @@ public class AuthenticationController {
 
         return ResponseEntity.ok(response);
     }
-
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("/refresh")
     public ResponseEntity<JwtAuthenticationResponse> refresh(@RequestBody RefreshTokenRequest refreshTokenRequest){
         String token = refreshTokenRequest.getToken();
@@ -65,6 +67,7 @@ public class AuthenticationController {
         return ResponseEntity.ok(response);
     }
 
+    @PreAuthorize("permitAll()")
     @PostMapping("/forgot-password")
     public ResponseEntity<String> forgotPassword(@RequestParam("email") String email) {
         logger.info("Password reset requested for email: " + email);
@@ -74,7 +77,7 @@ public class AuthenticationController {
         logger.info("Password reset link sent for email: " + email);
         return ResponseEntity.ok("Password reset link has been sent to your email");
     }
-
+    @PreAuthorize("permitAll()")
     @PutMapping("/reset-password")
     public ResponseEntity<String> resetPassword(@RequestBody ResetPasswordRequest request) {
         String token = request.getToken();

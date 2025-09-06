@@ -4,6 +4,7 @@ import com.CinemaGo.model.dto.*;
 import com.CinemaGo.service.UserService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -11,8 +12,9 @@ import java.util.List;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/api/v1/users")
 @Tag(name = "User")
+@CrossOrigin
 public class UserController {
     private UserService userService;
     private static final Logger logger = Logger.getLogger(UserController.class.getName());
@@ -22,6 +24,8 @@ public class UserController {
         this.userService = userService;
     }
 
+
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping()
     public ResponseEntity<List<CustomUserDTO>> getAllUsers(){
         logger.info("Fetching all users");
@@ -30,6 +34,7 @@ public class UserController {
         return response;
     }
 
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @GetMapping("/{id}")
     public ResponseEntity<UserDTO> findUserById(@PathVariable(value = "id") Long userId){
         logger.info("Fetching user with ID: " + userId);
@@ -41,6 +46,8 @@ public class UserController {
         return response;
     }
 
+
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @PutMapping("/{id}")
     public ResponseEntity<UserProfileDTO> updateUserProfile(
             @RequestBody UserProfileDTO userProfileDTO,
@@ -51,6 +58,8 @@ public class UserController {
         return response;
     }
 
+
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @PutMapping("/{id}/profile-picture")
     public ResponseEntity<ProfileDTO> updateProfilePicture(
             @PathVariable("id") Long userId,
@@ -60,6 +69,8 @@ public class UserController {
         logger.info("Updated profile picture for user ID: " + userId);
         return response;
     }
+
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteUser(@PathVariable(name = "id") Long userId){
         logger.info("Deleting user ID: " + userId);
@@ -67,6 +78,8 @@ public class UserController {
         logger.info("Deleted user ID: " + userId);
         return response;
     }
+
+    @PreAuthorize("hasRole('ADMIN') or #userId == principal.id")
     @PutMapping("/{id}/password")
     public ResponseEntity<String> changePassword(@PathVariable(name = "id") Long userId,
                                                  @RequestBody ChangePasswordDTO changePasswordDTO){

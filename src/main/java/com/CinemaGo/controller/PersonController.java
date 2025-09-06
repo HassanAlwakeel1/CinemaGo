@@ -4,8 +4,10 @@ import com.CinemaGo.model.dto.PersonRequestDTO;
 import com.CinemaGo.model.dto.PersonResponseDTO;
 import com.CinemaGo.model.entity.Person;
 import com.CinemaGo.service.PersonService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -13,14 +15,17 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @RestController
-@RequestMapping("/api/persons")
+@RequestMapping("/api/v1/persons")
 @RequiredArgsConstructor
+@Tag(name = "Person")
+@CrossOrigin
 public class PersonController {
 
     private final PersonService personService;
     private static final Logger logger = Logger.getLogger(PersonController.class.getName());
 
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<PersonResponseDTO> createPerson(@RequestBody PersonRequestDTO dto) {
         try {
@@ -33,6 +38,7 @@ public class PersonController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{id}")
     public ResponseEntity<Person> getPersonById(@PathVariable Long id) {
         try {
@@ -45,6 +51,7 @@ public class PersonController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
     public ResponseEntity<List<Person>> getAllPersons() {
         try {
@@ -57,6 +64,7 @@ public class PersonController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<PersonResponseDTO> updatePerson(@PathVariable Long id, @RequestBody PersonRequestDTO person) {
         try {
@@ -69,6 +77,7 @@ public class PersonController {
         }
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletePerson(@PathVariable Long id) {
         try {

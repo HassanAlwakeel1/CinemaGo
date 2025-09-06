@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.logging.Level;
@@ -20,7 +19,8 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/v1/showtimes")
 @RequiredArgsConstructor
-@Tag(name = "Showtimes", description = "CRUD operations for movie showtimes")
+@Tag(name = "Showtimes")
+@CrossOrigin
 public class ShowtimeController {
 
     private final ShowtimeService showtimeService;

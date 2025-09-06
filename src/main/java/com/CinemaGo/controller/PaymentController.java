@@ -4,8 +4,10 @@ import com.CinemaGo.model.dto.ReservationRequest;
 import com.CinemaGo.service.SeatReservationService;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.HashMap;
@@ -15,6 +17,8 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/payments")
 @RequiredArgsConstructor
+@Tag(name = "Payment")
+@CrossOrigin
 public class PaymentController {
 
     private final SeatReservationService reservationService;
@@ -24,6 +28,7 @@ public class PaymentController {
     @Value("${stripe.public.key}")
     private String publicKey;
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/create-checkout-session")
     public Map<String, Object> createCheckoutSession(@RequestBody ReservationRequest request) throws Exception {
         // create reservation with PENDING status

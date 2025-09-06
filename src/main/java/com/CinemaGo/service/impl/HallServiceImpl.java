@@ -15,7 +15,6 @@ import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -29,8 +28,6 @@ public class HallServiceImpl implements HallService {
     private final HallMapper hallMapper;
 
     @Override
-    @CachePut(value = "HALL_CACHE", key = "#result.id()")
-    @CacheEvict(value = "HALL_LIST_CACHE", allEntries = true)
     public HallResponseDto createHall(HallRequestDto dto) {
         logger.info("Creating new hall with name: " + dto.getName());
         Hall hall = hallMapper.toEntity(dto);
@@ -40,7 +37,6 @@ public class HallServiceImpl implements HallService {
     }
 
     @Override
-    @Cacheable(value = "HALL_CACHE", key = "#id")
     public HallResponseDto getHallById(Long id) {
         logger.info("Fetching hall with ID: " + id);
         Hall hall = hallRepository.findById(id).
@@ -64,8 +60,6 @@ public class HallServiceImpl implements HallService {
     }
 
     @Override
-    @CachePut(value = "HALL_CACHE", key = "#result.id()")
-    @CacheEvict(value = "HALL_LIST_CACHE", allEntries = true)
     public HallResponseDto updateHall(Long id, HallRequestDto dto) {
         logger.info("Updating hall with ID: " + id);
         Hall hall = hallRepository.findById(id)
@@ -90,10 +84,6 @@ public class HallServiceImpl implements HallService {
 
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "HALL_CACHE", key = "#id"),
-            @CacheEvict(value = "HALL_LIST_CACHE", allEntries = true)
-    })
     public void deleteHall(Long id) {
         logger.info("Request to delete hall with ID: " + id);
         Hall hall = hallRepository.findById(id)

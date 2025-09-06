@@ -14,10 +14,6 @@ import com.CinemaGo.service.ShowtimeService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -59,7 +55,6 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     }
 
     @Override
-    @Cacheable(value = "SHOWTIME_CACHE", key = "#id")
     public ShowtimeResponse getShowtime(Long id) {
         logger.info("Getting showtime with ID: " + id);
         Showtime showtime = showtimeRepository.findById(id)
@@ -79,8 +74,6 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     }
 
     @Override
-    @CachePut(value = "SHOWTIME_CACHE", key = "#id")
-    @CacheEvict(value = "SHOWTIMES_BY_MOVIE", allEntries = true)
     public ShowtimeResponse updateShowtime(Long id, ShowtimeRequest request) {
         logger.info("Updating showtime with ID: " + id);
         Showtime showtime = showtimeRepository.findById(id)
@@ -104,16 +97,11 @@ public class ShowtimeServiceImpl implements ShowtimeService {
     }
 
     @Override
-    @Caching(evict = {
-            @CacheEvict(value = "SHOWTIME_CACHE", key = "#id"),
-            @CacheEvict(value = "SHOWTIMES_BY_MOVIE", allEntries = true)
-    })
     public void deleteShowtime(Long id) {
         showtimeRepository.deleteById(id);
     }
 
     @Override
-    @Cacheable(value = "SHOWTIMES_BY_MOVIE", key = "#movieId")
     public List<ShowtimeResponse> getShowtimesByMovie(Long movieId) {
         List<Showtime> showtimes = showtimeRepository.findByMovieId(movieId);
         return showtimes.stream()

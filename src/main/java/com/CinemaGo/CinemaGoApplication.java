@@ -7,7 +7,6 @@ import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 
 @SpringBootApplication
-@EnableCaching
 public class CinemaGoApplication {
     @Bean
     public ModelMapper modelMapper(){

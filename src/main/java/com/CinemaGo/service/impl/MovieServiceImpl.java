@@ -36,7 +36,6 @@ public class MovieServiceImpl implements MovieService {
     //key = "#result.id" is used to cache the result of this method
     //يعني ايه ال #result.id؟
     @Override
-    @CachePut(value = "MOVIE_CACHE",key = "#result.id()") //CachePut responsible of Caching the result of this method
     public MovieDTO createMovie(MovieDTO dto) {
         LOGGER.info("Creating movie {}", dto);
         Movie movie = movieMapper.toEntity(dto);
@@ -68,7 +67,6 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    @Cacheable(value = "MOVIE_CACHE",key = "#id")
     public MovieDTO getMovie(Long id) {
         LOGGER.info("Fetching movie with id {}", id);
         Movie movie = movieRepository.findById(id)
@@ -78,7 +76,6 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    @CachePut(value = "MOVIE_CACHE",key = "#result.id()")
     public MovieDTO updateMovie(Long id, MovieDTO dto) {
         LOGGER.info("Updating movie with id {}", id);
         Movie movie = movieRepository.findById(id)
@@ -95,7 +92,6 @@ public class MovieServiceImpl implements MovieService {
     }
 
     @Override
-    @CacheEvict(value = "MOVIE_CACHE",key = "#id")
     public void deleteMovie(Long id) {
         LOGGER.info("Deleting movie with id {}", id);
         Movie movie = movieRepository.findById(id)

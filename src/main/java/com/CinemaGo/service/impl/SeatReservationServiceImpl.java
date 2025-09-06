@@ -15,9 +15,6 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -69,7 +66,6 @@ public class SeatReservationServiceImpl implements SeatReservationService {
     }
 
     @Override
-    @Cacheable(value = "RESERVATION_CACHE", key = "#id")
     public ReservationAdminResponse getReservationByIdForAdmin(Long id) {
         SeatReservation reservation = reservationRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reservation not found with id: " + id));
@@ -94,7 +90,6 @@ public class SeatReservationServiceImpl implements SeatReservationService {
     }
 
     @Override
-    @CachePut(value = "RESERVATION_CACHE", key = "#id")
     public ReservationResponse updateReservationStatus(Long id, String status) {
         logger.info("Updating reservation status with id: " + id + " to status: " + status);
         SeatReservation reservation = reservationRepository.findById(id)
@@ -104,7 +99,6 @@ public class SeatReservationServiceImpl implements SeatReservationService {
     }
 
     @Override
-    @CacheEvict(value = "RESERVATION_CACHE", key = "#id")
     public void deleteReservation(Long id) {
         logger.info("Deleting reservation with id: " + id);
         SeatReservation reservation = reservationRepository.findById(id)

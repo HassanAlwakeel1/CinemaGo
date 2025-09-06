@@ -3,8 +3,10 @@ package com.CinemaGo.controller;
 import com.CinemaGo.model.dto.SeatRequestDto;
 import com.CinemaGo.model.dto.SeatResponseDto;
 import com.CinemaGo.service.SeatService;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -14,6 +16,8 @@ import java.util.logging.Logger;
 @RestController
 @RequestMapping("/api/v1/seats")
 @RequiredArgsConstructor
+@Tag(name = "Seat")
+@CrossOrigin
 public class SeatController {
 
     private final SeatService seatService;
@@ -21,6 +25,7 @@ public class SeatController {
 
 
     /** Create a new Seat */
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<SeatResponseDto> createSeat(@RequestBody SeatRequestDto dto) {
         try {
@@ -35,6 +40,7 @@ public class SeatController {
 
 
     /** Get all seats for a hall */
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/hall/{hallId}")
     public ResponseEntity<List<SeatResponseDto>> getSeatsByHall(@PathVariable Long hallId) {
         try {
@@ -48,6 +54,7 @@ public class SeatController {
     }
 
     /** Get a seat by ID */
+    @PreAuthorize("hasAnyRole('ADMIN','USER')")
     @GetMapping("/{id}")
     public ResponseEntity<SeatResponseDto> getSeatById(@PathVariable Long id) {
         try {
@@ -61,6 +68,7 @@ public class SeatController {
     }
 
     /** Update a seat by ID */
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
     public ResponseEntity<SeatResponseDto> updateSeat(
             @PathVariable Long id,
@@ -77,6 +85,7 @@ public class SeatController {
     }
 
     /** Delete a seat by ID */
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteSeat(@PathVariable Long id) {
         try {

@@ -8,9 +8,6 @@ import com.CinemaGo.service.PersonService;
 import lombok.RequiredArgsConstructor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.CachePut;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -45,7 +42,6 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    @Cacheable(value = "PERSON_CACHE", key = "#id")
     public Person getPersonById(Long id) {
         logger.info("Fetching person with id: {}", id);
         return personRepository.findById(id)
@@ -59,7 +55,6 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    @CachePut(value = "PERSON_CACHE", key = "#id")
     public PersonResponseDTO updatePerson(Long id, PersonRequestDTO dto) {
         logger.info("Updating person with id: {}", id);
         // Fetch existing person
@@ -86,7 +81,6 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    @CacheEvict(value = "PERSON_CACHE", key = "#id")
     public void deletePerson(Long id) {
         logger.info("Deleting person with id: {}", id);
         Person existing = getPersonById(id);
